@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "usuario")
+@Document(collection = "usuarios")
 public class UsuarioEntity {
 
 	
