@@ -165,13 +165,13 @@ public class UsuarioController {
 				
 		return ResponseEntity.ok().body( listaDTO );
 	}
-//	
-//	@PatchMapping("usuarios/update/{id}")
-//	public ResponseEntity<Void> updateUsuario(@PathVariable int id, 
-//			@RequestBody UsuarioDTO dto){
-//		
-//		this.usuarioService.updateUsuario(id, dto.getNome());
-//		
-//		return ResponseEntity.ok().build();
-//	}
+	
+	@PatchMapping("usuarios/update/{id}")
+	public ResponseEntity<UsuarioDTO> updateUsuario(@PathVariable String id, 
+			@RequestBody UsuarioDTO dto){
+		
+		UsuarioEntity usuario = this.usuarioService.updateUsuario(id, dto.getNome());
+		
+		return ResponseEntity.ok().body( usuario.toDTO() );
+	}
 }
