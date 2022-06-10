@@ -32,7 +32,7 @@ public class SwaggerConfig extends WebMvcConfigurationSupport {
 	}
 
 	private ApiInfo metaData() {
-		return new ApiInfoBuilder().title("MS Mongo RESTFul Documentatation").description("MS Mongo RESTFul."
+		return new ApiInfoBuilder().title("MS DIGI RESTFul Documentatation").description("MS DIGI RESTFul."
 				+ "<br>Toda documentação pode ser encontrada no [Github](https://github.com/ffborelli/curso-digi-2022-04-04)")
 				.version("v1")
 				.termsOfServiceUrl(
