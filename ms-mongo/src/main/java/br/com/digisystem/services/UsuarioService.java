@@ -2,6 +2,8 @@ package br.com.digisystem.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import br.com.digisystem.entities.UsuarioEntity;
 
 public interface UsuarioService {
@@ -13,4 +15,5 @@ public interface UsuarioService {
 	void delete(String id);
 	List<UsuarioEntity> getByNome(String nome);
 	UsuarioEntity updateUsuario(String id, String nome);
+	Page<UsuarioEntity> getAllPagination(int page, int limit);
 }

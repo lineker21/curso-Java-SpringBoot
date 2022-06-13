@@ -4,19 +4,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import br.com.digisystem.entities.UsuarioEntity;
+import br.com.digisystem.repositories.impl.CustomRepositoryImpl;
 import br.com.digisystem.utils.UsuarioUtil;
+import lombok.extern.slf4j.Slf4j;
 
+/*
+	@Import feature for tests was primarily added to allow additional 
+		beans to be registered easily
+	@Import é uma funcionalidade de teste que permite adicionar BEANS
+	para serem resgistrados facilmente. No caso do CustomRepositoryTests,
+	como ele não herda a MongoRepository, então devemos dizer quais
+	Beans (objetos a serem gerenciados pelo Spring) devem ser usados. 
+	
+	As ferramentas de teste unitário precisam "saber" quais objetos 
+	devem ser gerenciados (Bean). 
+			
+	Bean são objetos que vão ser gerenciados pelo Spring 
+*/
 @DataMongoTest
+@Import(CustomRepositoryImpl.class)
 @ExtendWith(SpringExtension.class)
+@Slf4j
 public class CustomRepositoryTests extends UsuarioUtil{
 	
 	@Autowired
@@ -25,9 +43,19 @@ public class CustomRepositoryTests extends UsuarioUtil{
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	
+//	@Autowired
+//	private TestEntityManager testEntityManager;
+	
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	//private TestEntityManager testEntityManager;
+	
+	@BeforeEach
+	void beforeEachTest(){
+		mongoTemplate.dropCollection(UsuarioEntity.class);
+		mongoTemplate.createCollection(UsuarioEntity.class);
+		//System.out.println("beforeEach");
+		log.info("beforeEach");
+	}
 	
 	
 	// https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
@@ -41,6 +69,7 @@ public class CustomRepositoryTests extends UsuarioUtil{
 		// Insiro o objeto no banco H2
 		//testEntityManager.persist(usuarioEntity);
 		mongoTemplate.insert(usuarioEntity);
+		
 		// execução do teste
 
 		customRepository.updateUsuario(usuarioEntity.getId(), "nome-alterado");
