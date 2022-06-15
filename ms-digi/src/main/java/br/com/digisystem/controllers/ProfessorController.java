@@ -10,9 +10,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
+
+
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import br.com.digisystem.dtos.ProfessorDTO;
 import br.com.digisystem.entities.ProfessorEntity;
@@ -108,4 +120,39 @@ public ResponseEntity<ProfessorDTO> create(@RequestBody ProfessorDTO professor )
 			
 			return ResponseEntity.ok().build();
 		}
+		
+		@GetMapping("professores/export")
+	    public void exportToCSV(HttpServletResponse response) throws IOException {
+	        response.setContentType("text/csv");
+	        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+	        String currentDateTime = dateFormatter.format(new Date());
+	         
+	        String headerKey = "Content-Disposition";
+	        String headerValue = "attachment; filename=professores_" + currentDateTime + ".csv";
+	        response.setHeader(headerKey, headerValue);
+	         
+	        List<ProfessorEntity> lista = this.professorService.getAll();
+	        
+	        List<ProfessorDTO> listaDTO = new ArrayList<>();
+			
+			for(int i = 0; i < lista.size(); i++) {
+				listaDTO.add(lista.get(i).toDTO());
+			}
+	        
+	 
+	        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+	        String[] csvHeader = {"ID", "Nome", "cpf", "telefone", "email"};
+	        String[] nameMapping = {"id", "nome", "cpf", "telefone", "email"};
+	         
+	        csvWriter.writeHeader(csvHeader);
+	         
+	        for (ProfessorDTO professorDTO : listaDTO) {
+	            csvWriter.write(professorDTO, nameMapping);
+	        }
+	         
+	        csvWriter.close();
+	         
+	    }
+		
+		
 }

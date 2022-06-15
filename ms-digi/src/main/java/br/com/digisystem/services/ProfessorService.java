@@ -60,4 +60,5 @@ public class ProfessorService {
 	public void updateProfessor(int id, String nome) {
 		this.professorRepository.updateProfessor(id, nome);
 	}
+	
 }

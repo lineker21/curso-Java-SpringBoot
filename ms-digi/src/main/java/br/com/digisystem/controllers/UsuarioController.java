@@ -1,8 +1,13 @@
 package br.com.digisystem.controllers;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import br.com.digisystem.dtos.UsuarioDTO;
 import br.com.digisystem.entities.UsuarioEntity;
@@ -163,5 +171,34 @@ List<UsuarioEntity> lista = this.usuarioService.getByNome(nome);
 		
 		return ResponseEntity.ok().build();
 	}
+	
+	
+	@GetMapping("usuarios/export")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+         
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+         
+        List<UsuarioEntity> lista = this.usuarioService.getAll();
+        
+        List<UsuarioDTO> listaDTO = new ArrayList<>();
+ 
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+        String[] csvHeader = {"User ID", "E-mail", "Full Name", "Roles", "Enabled"};
+        String[] nameMapping = {"id", "email", "fullName", "roles", "enabled"};
+         
+        csvWriter.writeHeader(csvHeader);
+         
+        for (UsuarioDTO usuarioDTO : listaDTO) {
+            csvWriter.write(usuarioDTO, nameMapping);
+        }
+         
+        csvWriter.close();
+         
+    }
 	
 }
